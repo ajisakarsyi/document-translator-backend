@@ -7,18 +7,18 @@ It integrates with a self-hosted **Ollama LLM API** for translations and enforce
 
 ## Features
 
-- 🔒 **Authentication & Authorization**
+- **Authentication & Authorization**
   - OAuth2 token introspection against external Auth server
   - Role-based access (`user` vs `admin`)
-- 📄 **Document Support**
+- **Document Support**
   - Upload & translate **PDF → DOCX**, **DOCX**, **PPTX**
-- 🌐 **Translation Backend**
+- **Translation Backend**
   - Uses **Ollama** self-hosted LLM API
   - Preserves formatting, placeholders, and line breaks
-- 🩺 **Health Checks**
+- **Health Checks**
   - `/health` (basic)
   - `/health/auth` (requires valid token)
-- 👤 **User Identity**
+- **User Identity**
   - `/whoami` returns token claims
 
 ---
