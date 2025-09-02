@@ -1,20 +1,40 @@
-# Multilingual Document Translator API
+# Multilingual Document Translator API with Role-Based Authentication
 
-This FastAPI application provides an API for translating documents (PDF, DOCX, PPTX) between supported languages using the Ollama large language model (LLM). It preserves the formatting of the original documents and reconstructs translated files accordingly.
+This project is a **FastAPI-based document translation service** that supports **PDF, PPTX, and DOCX** files.  
+It integrates with a self-hosted **Ollama LLM API** for translations and enforces **role-based authentication** (User/Admin) via an external Auth server.
+
+---
+
+## Features
+
+- 🔒 **Authentication & Authorization**
+  - OAuth2 token introspection against external Auth server
+  - Role-based access (`user` vs `admin`)
+- 📄 **Document Support**
+  - Upload & translate **PDF → DOCX**, **DOCX**, **PPTX**
+- 🌐 **Translation Backend**
+  - Uses **Ollama** self-hosted LLM API
+  - Preserves formatting, placeholders, and line breaks
+- 🩺 **Health Checks**
+  - `/health` (basic)
+  - `/health/auth` (requires valid token)
+- 👤 **User Identity**
+  - `/whoami` returns token claims
 
 ---
 
 ## Requirements
 
-- Python 3.8+
-- pip (Python package manager)
+- Python 3.10+
+- [Ollama](https://ollama.ai/) running locally or remotely
+- An OAuth2-compliant Authentication Server (e.g., Authentik, Keycloak)
 
 ---
 
 ## Installation
 
 1. **Clone the repository or download the code.**
-2. **Create a virtual environment (optional but recommended):**
+2. **Create a virtual environment (recommended):**
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -31,6 +51,15 @@ This FastAPI application provides an API for translating documents (PDF, DOCX, P
 Create a `.env` file in the root directory with the following variables:
 
 ```env
+# Auth server config
+AUTH_SERVER_URL=http://localhost:4000
+INTROSPECTION_ENDPOINT=/connect/introspect
+AUTH_CLIENT_ID=your-client-id
+AUTH_CLIENT_SECRET=your-client-secret
+REQUIRED_AUDIENCE=auth-template-api
+REQUIRED_SCOPES=read write
+
+# Ollama config
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL_NAME=mistral-nemo:12b
 ```
@@ -39,12 +68,12 @@ You can adjust the `OLLAMA_MODEL_NAME` according to the model you have installed
 
 ---
 
-## How to Run
+## Running the API
 
 Start the FastAPI server with:
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Once running, the API will be available at `http://localhost:8000`.
@@ -76,21 +105,35 @@ http://localhost:8000/docs
 
 ---
 
-## API Usage
+## API Endpoints
 
-### Endpoint: `/translate-document/`
+### Health
+- `GET /health` → basic health check
+- `GET /health/auth` → requires valid token
 
-**Method:** `POST`  
-**Form Parameters:**
+### Authenticated Identity
+- `GET /whoami` → returns token subject, client, scopes, role
 
-- `file`: UploadFile (PDF, DOCX, PPTX)
-- `source_language`: One of the supported languages
-- `target_language`: One of the supported languages
+### Document Workflow
+- `POST /user/upload` → user uploads document (pending approval)
+- `POST /admin/upload` → admin uploads and auto-approves
+- `POST /admin/approve/{request_id}` → admin approves user uploads
 
-### Example using `curl`:
+### Translation
+- `POST /translate-document/`  
+  **Form Data:**
+  - `file`: PDF, DOCX, PPTX
+  - `source_language`: one of [English, Japanese, Indonesian, French, Spanish, German]
+  - `target_language`: same list (must differ from source)
+
+Returns the translated file in the correct format.
+
+---
+
+## Example Usage (cURL)
 
 ```bash
-curl -X 'POST'   'http://localhost:8000/translate-document/'   -F 'file=@yourfile.pdf'   -F 'source_language=English'   -F 'target_language=Japanese'   --output translated_file.docx
+curl -X POST "http://localhost:8000/translate-document/"   -H "Authorization: Bearer <ACCESS_TOKEN>"   -F "source_language=English"   -F "target_language=Indonesian"   -F "file=@document.pdf"   -o translated.docx
 ```
 
 ---
@@ -100,9 +143,11 @@ curl -X 'POST'   'http://localhost:8000/translate-document/'   -F 'file=@yourfil
 - PDF translation converts the file to DOCX format.
 - PPTX slides must contain editable text (non-image text).
 - Requires a running Ollama server with the specified model downloaded.
+- Authentication caching is done using `cachetools.TTLCache`.
+- This project is **not production-hardened**; persistent storage is not included.
 
 ---
 
 ## License
 
-This project is provided as-is for demonstration purposes. Please respect licenses of underlying packages and models.
+MIT
