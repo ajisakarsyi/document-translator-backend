@@ -1,17 +1,17 @@
-# 📝 Multilingual Document Translator API
+# Multilingual Document Translator API
 
 This FastAPI application provides an API for translating documents (PDF, DOCX, PPTX) between supported languages using the Ollama large language model (LLM). It preserves the formatting of the original documents and reconstructs translated files accordingly.
 
 ---
 
-## 📦 Requirements
+## Requirements
 
 - Python 3.8+
 - pip (Python package manager)
 
 ---
 
-## 🔧 Installation
+## Installation
 
 1. **Clone the repository or download the code.**
 2. **Create a virtual environment (optional but recommended):**
@@ -26,7 +26,7 @@ This FastAPI application provides an API for translating documents (PDF, DOCX, P
 
 ---
 
-## ⚙️ Environment Configuration
+## Environment Configuration
 
 Create a `.env` file in the root directory with the following variables:
 
@@ -39,7 +39,7 @@ You can adjust the `OLLAMA_MODEL_NAME` according to the model you have installed
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
 Start the FastAPI server with:
 
@@ -57,7 +57,7 @@ http://localhost:8000/docs
 
 ---
 
-## 🌍 Supported File Types
+## Supported File Types
 
 - `.pdf` - Converted internally to DOCX before translation.
 - `.docx` - Translates all paragraphs.
@@ -65,7 +65,7 @@ http://localhost:8000/docs
 
 ---
 
-## 🌐 Supported Languages
+## Supported Languages
 
 - English
 - Japanese
@@ -76,7 +76,7 @@ http://localhost:8000/docs
 
 ---
 
-## 📤 API Usage
+## API Usage
 
 ### Endpoint: `/translate-document/`
 
@@ -95,7 +95,7 @@ curl -X 'POST'   'http://localhost:8000/translate-document/'   -F 'file=@yourfil
 
 ---
 
-## ⚠️ Notes
+## Notes
 
 - PDF translation converts the file to DOCX format.
 - PPTX slides must contain editable text (non-image text).
@@ -103,6 +103,6 @@ curl -X 'POST'   'http://localhost:8000/translate-document/'   -F 'file=@yourfil
 
 ---
 
-## 📄 License
+## License
 
 This project is provided as-is for demonstration purposes. Please respect licenses of underlying packages and models.
