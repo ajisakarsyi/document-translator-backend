@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Document Translation API
+  version: 1.0.0
+  description: API for uploading and translating documents with token usage estimation.
+servers:
+  - url: http://localhost:8000
+
+paths:
+  /translate-document/:
+    post:
+      summary: Translate uploaded document
+      description: Uploads a document and translates its content while estimating token usage.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document to upload (.txt, .pdf, .docx)
+                source_language:
+                  type: string
+                  enum: [English, Japanese]
+                  description: Source language
+                target_language:
+                  type: string
+                  enum: [English, Japanese]
+                  description: Target language
+      responses:
+        '200':
+          description: Translation Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  original_filename:
+                    type: string
+                    example: "test_JP.pdf"
+                  source_language:
+                    type: string
+                    example: "Japanese"
+                  target_language:
+                    type: string
+                    example: "English"
+                  translated_content:
+                    type: string
+                    example: "株式会社GeoNetics is developing a next-generation..."
+                  token_usage:
+                    type: object
+                    properties:
+                      with_exclusion:
+                        type: integer
+                        example: 356
+                      without_exclusion:
+                        type: integer
+                        example: 438
+                      estimated_tokens_saved:
+                        type: integer
+                        example: 82
